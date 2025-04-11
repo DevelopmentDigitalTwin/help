@@ -1,0 +1,291 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<title>caldex</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css"> 
+<!-- 
+.selected {font-weight: normal;background-color: #E2E2E2;padding:0px,2px,0px,2px;}
+.unselected { font-weight: normal;padding:0px,2px,0px,2px;}
+.hand { cursor: hand; }
+.p {height: 16px;width: 16px;vertical-align: middle;border: 0;}
+div,body { font-family: Tahoma, Verdana; font-size: 11px; }
+A:link {text-decoration: none; color:#000000}
+A:visited {text-decoration: none; color: #000000}
+A:active {text-decoration: none; color: #000000 }
+A:hover {text-decoration: none; color: #FF0000 }
+
+-->
+</style>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+var cl,pn,pm,bl;
+var path = 'icons/';
+var pos = 0;
+var icon;
+var tar = 'content';
+var display;
+var imgi;
+var AutoCollapse;
+var LastSelected = -1;
+var loaded = false;
+var max;
+var divlist;
+
+function SetEnv(v,a){
+
+if(v==0){ 
+	pn = [['daplus.gif','daminus.gif'],['tplus.gif','tminus.gif'],['uaplus.gif','uaminus.gif'],['splus.gif','sminus.gif']];
+	PreloadImg('downangle.gif','tshaped.gif','upangle.gif','sline.gif','daplus.gif','daminus.gif','tplus.gif','tminus.gif','uaplus.gif','uaminus.gif','splus.gif','sminus.gif','blank.gif','line.gif');
+}else{
+	pn = [['plus.gif','minus.gif']];
+	PreloadImg('plus.gif','minus.gif','blank.gif');
+
+}
+AutoCollapse = a;
+}
+
+ function PreloadImg(){
+if (document.images) { 
+	var imgs = PreloadImg.arguments; 
+	var pload = new Array();
+	for (var i=0; i<imgs.length; i++) { 
+		pload[i] = new Image; 
+		pload[i].src = path + imgs[i]; 
+	} 
+} 
+ } 
+
+function get(o){
+var x;
+if(document.all) x=document.all[o]; 
+if(document.getElementById) x=document.getElementById(o);
+
+return x;
+}
+
+
+function pnImg(img){
+var i,j;
+for(i=0;i<=3;i++){
+	for(j=0;j<=1;j++){
+	if(img.substr(img.lastIndexOf('/') + 1)== pn[i][j]){
+		return i;
+	}
+	}
+}
+}
+function icon(img){
+var f;
+f = img.substr(img.lastIndexOf('/') + 1);
+if( f=='1.gif' || f=='2.gif'){
+	return ['1.gif','2.gif'];
+}
+if( f=='3.gif' || f=='4.gif'){
+	return ['3.gif','4.gif'];
+}
+if( f=='5.gif' || f=='6.gif'){
+	return ['5.gif','6.gif'];
+}
+if( f=='7.gif' || f=='8.gif'){
+	return ['7.gif','8.gif'];
+}
+return [f,f];
+}
+
+function show(id){
+get('d' + id).style.display='block';
+if(get('imgn' + id )) get('imgn' + id ).src= path + pn[pnImg(get('imgn' + id ).src)][1];
+get('img' + id ).src= path + icon(get('img' + id ).src)[1];
+
+}
+
+function collapse(id){
+get('d' + id ).style.display='none';
+if(get('imgn' + id )) get('imgn' + id ).src= path + pn[pnImg(get('imgn' + id ).src)][0];
+get('img' + id ).src= path + icon(get('img' + id ).src)[0];
+
+}
+
+function collapseAll(){
+var i;
+var o;
+for(i=0;i<=divlist.length-1;i++){
+	if(o=get('d' + divlist[i])){
+		if(o.style.display!='none'){ 
+			collapse(divlist[i]);
+		}
+	}
+}
+}
+
+function showAll(){
+var i;
+var o;
+for(i=0;i<=divlist.length-1;i++){
+	if(o=get('d' + divlist[i])){
+		if(o.style.display!='block'){ 
+			show(divlist[i]);
+		}
+	}
+}
+}
+
+function unselectAll(){
+var i=0;
+while(get("l" + i)){
+	get("l" + i).className = "unselected";
+	i++;
+}
+}
+
+function clickNode(index){
+var e;
+
+e = get("l" + index);
+if(e==null) return;
+e = e.parentNode;
+if(e.nodeName == 'A'){
+	if(e.href!= window.location.href + '#'){
+		parent.parent.content.location.href = e.href;
+	}else{
+		selectNode(index);
+	}
+	e.onclick;
+}
+}
+
+function showParent(ele){
+var e;
+e = ele.parentNode;
+
+if(e==null) return;
+
+if(e.nodeName == 'DIV'){
+	if(e.id!='') show(e.id.substring(1,e.id.length ));
+}else if(e.nodeName == 'A'){
+
+}
+showParent(e);
+}
+
+function showNode(index){
+showParent(get("l" + index));
+LinkClick(index);
+}
+
+function selectNode(index){
+if(LastSelected!=index){
+//collapseAll();
+showParent(get("l" + index));
+LinkClick(index);
+get('l' + index).scrollIntoView(true);
+
+
+//alert(get('l' + index).offsetHeight + '|' + document.body.clientHeight + '|' + document.body.offsetHeight);
+window.scrollTo(0,document.body.scrollTop); // - document.body.clientHeight /3);
+}
+}
+
+
+function NodeClick(id){
+if(get('d' + id ).style.display=='none'){
+	show(id);
+}else{
+	collapse(id);
+}
+return false;
+}
+
+function LinkDblClick(id){
+if(!AutoCollapse){
+	if(get('d' + id ).style.display=='none'){
+		show(id);
+	}else{
+		collapse(id);
+	}
+}
+return false;
+}
+
+function LinkClick(index,hasChild,r){
+if(AutoCollapse && hasChild){
+	if(get('d' + index ).style.display=='none'){
+		collapseAll()
+		showParent(get('l' + index));
+		show(index);
+	}else{
+		collapseAll()
+		showParent(get('l' + index));	
+		collapse(index);
+	}
+}
+if(LastSelected!=-1){
+	get('l' + LastSelected).className = "unselected";
+}
+get('l' + index).className = "selected";
+LastSelected = index;
+return r;
+}
+
+function body_onmousemove(event){
+if(typeof(document.body.scrollTop)!='undefined'){
+if(parseInt(event.clientX)<5){
+window.scroll(0,document.body.scrollTop);}}
+if(typeof(window.scrollY)!='undefined'){
+if(parseInt(event.clientX)<5){
+window.scrollTo(0,window.scrollY);}}
+}
+
+window.defaultStatus = '';
+
+function body_onload(){
+get('loading').style.display='none';
+loaded = true;
+if(parent.parent.content.document.readyState){
+	if(parent.parent.content.document.readyState == 'complete'){
+		try{parent.parent.content.syn();}catch(e){};
+	}
+}else{
+	if(parent.parent.contentLoaded){
+		try{parent.parent.content.syn();}catch(e){};
+	}
+}
+}
+
+//-->
+</SCRIPT>
+<script language="JavaScript" src="languages.js"></script>
+
+</head>
+
+<body bgcolor="#ffffff" leftmargin="5" topmargin="5" marginwidth="5" marginheight="5" onmousemove="body_onmousemove(event);" onload="body_onload();">
+<div id="loading"><font color="#FF0000" size="1"> Loading table of contents... 
+</font><br><br></div>
+<script>SetEnv(0,false)</script><div><nobr><img src="icons/downangle.gif" class="p"><a href="topics/Introduction.htm" onclick="return LinkClick('0',false,true)" target="content" title="Introduction" onmousemove="window.status='Introduction'"><img src="icons/11.gif" class="p"> <span id="l0" class="unselected">Introduction</span></a></nobr></div>
+<div><nobr><a href="#" onClick="return NodeClick('1')"><img id="imgn1" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('1',true,false)" onDblClick="return LinkDblClick('1')" target="content" title="Getting Started" onmousemove="window.status='Getting Started'"><img id="img1" src="icons/1.gif" class="p"> <span id="l1" class="unselected">Getting Started</span></a></nobr></div>
+<div id="d1" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Access_the_Platform.htm" onclick="return LinkClick('2',false,true)" target="content" title="Access the Platform" onmousemove="window.status='Access the Platform'"><img src="icons/11.gif" class="p"> <span id="l2" class="unselected">Access the Platform</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Register_&_Login.htm" onclick="return LinkClick('3',false,true)" target="content" title="Register &amp; Login" onmousemove="window.status='Register &amp; Login'"><img src="icons/11.gif" class="p"> <span id="l3" class="unselected">Register &amp; Login</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('4')"><img id="imgn4" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('4',true,false)" onDblClick="return LinkDblClick('4')" target="content" title="Data Preparation" onmousemove="window.status='Data Preparation'"><img id="img4" src="icons/1.gif" class="p"> <span id="l4" class="unselected">Data Preparation</span></a></nobr></div>
+<div id="d4" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/introduction1.htm" onclick="return LinkClick('5',false,true)" target="content" title="introduction" onmousemove="window.status='introduction'"><img src="icons/11.gif" class="p"> <span id="l5" class="unselected">introduction</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('6')"><img id="imgn6" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('6',true,false)" onDblClick="return LinkDblClick('6')" target="content" title="Data Sources" onmousemove="window.status='Data Sources'"><img id="img6" src="icons/1.gif" class="p"> <span id="l6" class="unselected">Data Sources</span></a></nobr></div>
+<div id="d6" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Import_Files.htm" onclick="return LinkClick('7',false,true)" target="content" title="Import Files" onmousemove="window.status='Import Files'"><img src="icons/11.gif" class="p"> <span id="l7" class="unselected">Import Files</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/DB_Connections.htm" onclick="return LinkClick('8',false,true)" target="content" title="DB Connections" onmousemove="window.status='DB Connections'"><img src="icons/11.gif" class="p"> <span id="l8" class="unselected">DB Connections</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('9')"><img id="imgn9" src="icons/uaplus.gif" class="p"></a><a href="#" onclick="return LinkClick('9',true,false)" onDblClick="return LinkDblClick('9')" target="content" title="Data Sets" onmousemove="window.status='Data Sets'"><img id="img9" src="icons/1.gif" class="p"> <span id="l9" class="unselected">Data Sets</span></a></nobr></div>
+<div id="d9" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Data_Sets.htm" onclick="return LinkClick('10',false,true)" target="content" title="Data Sets" onmousemove="window.status='Data Sets'"><img src="icons/11.gif" class="p"> <span id="l10" class="unselected">Data Sets</span></a></nobr></div>
+</div></div><div><nobr><a href="#" onClick="return NodeClick('11')"><img id="imgn11" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('11',true,false)" onDblClick="return LinkDblClick('11')" target="content" title="Pipelines" onmousemove="window.status='Pipelines'"><img id="img11" src="icons/1.gif" class="p"> <span id="l11" class="unselected">Pipelines</span></a></nobr></div>
+<div id="d11" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Data_Pipelines.htm" onclick="return LinkClick('12',false,true)" target="content" title="Data Pipelines" onmousemove="window.status='Data Pipelines'"><img src="icons/11.gif" class="p"> <span id="l12" class="unselected">Data Pipelines</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Model_Pipelines.htm" onclick="return LinkClick('13',false,true)" target="content" title="Model Pipelines" onmousemove="window.status='Model Pipelines'"><img src="icons/11.gif" class="p"> <span id="l13" class="unselected">Model Pipelines</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('14')"><img id="imgn14" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('14',true,false)" onDblClick="return LinkDblClick('14')" target="content" title="Schedulers" onmousemove="window.status='Schedulers'"><img id="img14" src="icons/1.gif" class="p"> <span id="l14" class="unselected">Schedulers</span></a></nobr></div>
+<div id="d14" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/$$unsavedpage1.htm" onclick="return LinkClick('15',false,true)" target="content" title="Model Performance" onmousemove="window.status='Model Performance'"><img src="icons/11.gif" class="p"> <span id="l15" class="unselected">Model Performance</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Schedule_Predictions.htm" onclick="return LinkClick('16',false,true)" target="content" title="Schedule Predictions" onmousemove="window.status='Schedule Predictions'"><img src="icons/11.gif" class="p"> <span id="l16" class="unselected">Schedule Predictions</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('17')"><img id="imgn17" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('17',true,false)" onDblClick="return LinkDblClick('17')" target="content" title="Dashboards" onmousemove="window.status='Dashboards'"><img id="img17" src="icons/1.gif" class="p"> <span id="l17" class="unselected">Dashboards</span></a></nobr></div>
+<div id="d17" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Dashboards.htm" onclick="return LinkClick('18',false,true)" target="content" title="Dashboards" onmousemove="window.status='Dashboards'"><img src="icons/11.gif" class="p"> <span id="l18" class="unselected">Dashboards</span></a></nobr></div>
+</div><div><nobr><img src="icons/tshaped.gif" class="p"><a href="topics/Infrastructure.htm" onclick="return LinkClick('19',false,true)" target="content" title="Infrastructure" onmousemove="window.status='Infrastructure'"><img src="icons/11.gif" class="p"> <span id="l19" class="unselected">Infrastructure</span></a></nobr></div>
+<div><nobr><img src="icons/tshaped.gif" class="p"><a href="topics/Developers_Guide.htm" onclick="return LinkClick('20',false,true)" target="content" title="Developers Guide" onmousemove="window.status='Developers Guide'"><img src="icons/11.gif" class="p"> <span id="l20" class="unselected">Developers Guide</span></a></nobr></div>
+<div><nobr><img src="icons/upangle.gif" class="p"><a href="topics/model_serving.htm" onclick="return LinkClick('21',false,true)" target="content" title="model serving" onmousemove="window.status='model serving'"><img src="icons/11.gif" class="p"> <span id="l21" class="unselected">model serving</span></a></nobr></div>
+<script>divlist = [1,4,6,9,11,14,17]</script>
+</body>
+</html>
